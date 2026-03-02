@@ -103,7 +103,7 @@ def rank_hospitals():
         # Fetch 2: Upper-Level Fallback (Grab 20 prominent legit hospitals nearby)
         payload_text = {
             "textQuery": "Hospital",
-            "locationBias": {
+            "locationRestriction": {
                 "circle": {"center": {"latitude": user_lat, "longitude": user_lng}, "radius": 20000.0}
             },
             "maxResultCount": 20
@@ -119,7 +119,7 @@ def rank_hospitals():
         radius_meters = 15000.0 if 'Level 1' in situation or 'Level 2' in situation else 25000.0
         payload_text = {
             "textQuery": search_query,
-            "locationBias": {
+            "locationRestriction": {
                 "circle": {"center": {"latitude": user_lat, "longitude": user_lng}, "radius": radius_meters}
             },
             "maxResultCount": 20
