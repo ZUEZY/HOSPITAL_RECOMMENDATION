@@ -224,17 +224,25 @@ def rank_hospitals():
     except Exception:
         return jsonify([])
 
+    # 🚨 THE AFRICA FIX: Filter out unreachable ocean/continent hops
+    reachable_hospitals = []
     for route in matrix_response:
+        # If Google can't find a driving route, drop the hospital entirely
+        if 'duration' not in route:
+            continue 
+            
         dest_index = route.get('destinationIndex')
-        duration_str = route.get('duration', '0s').replace('s', '')
+        duration_str = route.get('duration').replace('s', '')
         duration_sec = int(float(duration_str))
         
         if ambulance_mode: duration_sec = int(duration_sec / 1.4)
             
-        valid_hospitals[dest_index]['duration_sec'] = duration_sec
-        valid_hospitals[dest_index]['duration_text'] = f"{duration_sec // 60} mins"
+        hospital = valid_hospitals[dest_index]
+        hospital['duration_sec'] = duration_sec
+        hospital['duration_text'] = f"{duration_sec // 60} mins"
+        reachable_hospitals.append(hospital)
 
-    ranked_results = execute_mcdm_ranking(valid_hospitals, situation, category)
+    ranked_results = execute_mcdm_ranking(reachable_hospitals, situation, category)
     return jsonify(ranked_results)
 
 if __name__ == '__main__':
