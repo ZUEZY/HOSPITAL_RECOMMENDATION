@@ -1,5 +1,6 @@
 let map, marker, autocomplete, markersArray = [];
 
+// ADDED: First-Aid Medical Dictionary
 const firstAidTips = {
     "Cardiac": "🫀 <b>FIRST AID (CARDIAC):</b> Have the patient sit down and rest. Loosen tight clothing. If they are prescribed nitroglycerin, help them take it. Chew and swallow an aspirin (unless allergic). If unconscious and not breathing, begin CPR immediately.",
     "Trauma": "🩸 <b>FIRST AID (TRAUMA):</b> Do not move the person unless they are in immediate danger. Apply firm, direct pressure to any bleeding with a clean cloth. Keep the person warm to prevent shock.",
@@ -14,18 +15,10 @@ function initMap() {
         center: initialPos, zoom: 12, mapTypeControl: false
     });
 
-    // 🔵 CURRENT LOCATION: Distinct Blue Circle
     marker = new google.maps.Marker({
         position: initialPos, map: map, draggable: true,
         animation: google.maps.Animation.DROP,
-        icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            fillColor: '#4285F4',
-            fillOpacity: 1,
-            strokeColor: 'white',
-            strokeWeight: 2,
-            scale: 10
-        }
+        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
     });
 
     const input = document.getElementById("location-input");
@@ -76,6 +69,8 @@ async function findHospitals() {
     clearMarkers();
 
     const selectedCategory = document.getElementById('emergency-category').value;
+
+    // ADDED: Activate the First-Aid Banner dynamically
     const banner = document.getElementById('first-aid-banner');
     banner.innerHTML = firstAidTips[selectedCategory];
     banner.classList.add('active');
@@ -107,33 +102,26 @@ async function findHospitals() {
         bounds.extend(marker.getPosition());
 
         hospitals.forEach((h, index) => {
-            // THE FIX: Use hardcoded Hex codes for SVG drawing
-            // 🔴 Rank 1 = Red (#FF0000) | 🟢 Ranks 2-5 = Green (#228B22)
-            const markerColor = (index === 0) ? '#FF0000' : '#228B22';
-
             const hMarker = new google.maps.Marker({
                 position: { lat: h.lat, lng: h.lng }, 
                 map: map,
-                icon: {
-                    // This creates a circular bubble shape
-                    path: "M 0,0 m -12,0 a 12,12 0 1,0 24,0 a 12,12 0 1,0 -24,0",
-                    fillColor: markerColor,
-                    fillOpacity: 1,
-                    strokeColor: '#FFFFFF',
-                    strokeWeight: 2,
-                    scale: 1.2
-                },
+                icon: index === 0 
+                    ? 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' 
+                    : 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
                 label: {
                     text: (index + 1).toString(),
                     color: "white",
-                    fontWeight: "bold",
-                    fontSize: "14px"
+                    fontWeight: "bold"
                 }
             });
 
-            let statusBadge = (h.is_open === true) 
-                ? '<span style="background-color: #4CAF50; color: white; padding: 4px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 5px;">🟢 Verified Open</span>'
-                : '<span style="background-color: #9E9E9E; color: white; padding: 4px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 5px;">⚪ Hours Unknown</span>';
+            let statusBadge = '';
+            if (h.is_open === true) {
+                statusBadge = '<span style="background-color: #4CAF50; color: white; padding: 4px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 5px;">🟢 Verified Open</span>';
+            } else {
+                // If it made it this far and isn't True, it's Unknown (None). False is blocked by Python.
+                statusBadge = '<span style="background-color: #9E9E9E; color: white; padding: 4px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 5px;">⚪ Hours Unknown</span>';
+            }
 
             const info = new google.maps.InfoWindow({
                 content: `<div style="color:black; font-family:sans-serif; max-width: 260px;">
