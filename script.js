@@ -1,6 +1,5 @@
 let map, marker, autocomplete, markersArray = [];
 
-// ADDED: First-Aid Medical Dictionary
 const firstAidTips = {
     "Cardiac": "🫀 <b>FIRST AID (CARDIAC):</b> Have the patient sit down and rest. Loosen tight clothing. If they are prescribed nitroglycerin, help them take it. Chew and swallow an aspirin (unless allergic). If unconscious and not breathing, begin CPR immediately.",
     "Trauma": "🩸 <b>FIRST AID (TRAUMA):</b> Do not move the person unless they are in immediate danger. Apply firm, direct pressure to any bleeding with a clean cloth. Keep the person warm to prevent shock.",
@@ -15,7 +14,7 @@ function initMap() {
         center: initialPos, zoom: 12, mapTypeControl: false
     });
 
-    // UPDATED: Current Location is now a clear blue dot marker to distinguish from hospital ranks
+    // 🔵 CURRENT LOCATION: Blue Circle
     marker = new google.maps.Marker({
         position: initialPos, map: map, draggable: true,
         animation: google.maps.Animation.DROP,
@@ -77,7 +76,6 @@ async function findHospitals() {
     clearMarkers();
 
     const selectedCategory = document.getElementById('emergency-category').value;
-
     const banner = document.getElementById('first-aid-banner');
     banner.innerHTML = firstAidTips[selectedCategory];
     banner.classList.add('active');
@@ -91,7 +89,6 @@ async function findHospitals() {
     };
 
     try {
-       // Note: Change this URL to http://127.0.0.1:5000/rank_hospitals for local baseline testing
        const response = await fetch('https://hospital-recommendation-w438.onrender.com/rank_hospitals', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -110,26 +107,31 @@ async function findHospitals() {
         bounds.extend(marker.getPosition());
 
         hospitals.forEach((h, index) => {
+            // 🔴 Rank 1 = Red (#EA4335) | 🟢 Ranks 2-5 = Green (#34A853)
+            const markerColor = (index === 0) ? '#EA4335' : '#34A853';
+
             const hMarker = new google.maps.Marker({
                 position: { lat: h.lat, lng: h.lng }, 
                 map: map,
-                // UPDATED: Rank 1 stays Red (icon 1), Rank 2-5 become Green (icon 2)
-                icon: index === 0 
-                    ? 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' 
-                    : 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: markerColor,
+                    fillOpacity: 1,
+                    strokeColor: 'white',
+                    strokeWeight: 2,
+                    scale: 12
+                },
                 label: {
                     text: (index + 1).toString(),
                     color: "white",
-                    fontWeight: "bold"
+                    fontWeight: "bold",
+                    fontSize: "12px"
                 }
             });
 
-            let statusBadge = '';
-            if (h.is_open === true) {
-                statusBadge = '<span style="background-color: #4CAF50; color: white; padding: 4px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 5px;">🟢 Verified Open</span>';
-            } else {
-                statusBadge = '<span style="background-color: #9E9E9E; color: white; padding: 4px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 5px;">⚪ Hours Unknown</span>';
-            }
+            let statusBadge = (h.is_open === true) 
+                ? '<span style="background-color: #4CAF50; color: white; padding: 4px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 5px;">🟢 Verified Open</span>'
+                : '<span style="background-color: #9E9E9E; color: white; padding: 4px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 5px;">⚪ Hours Unknown</span>';
 
             const info = new google.maps.InfoWindow({
                 content: `<div style="color:black; font-family:sans-serif; max-width: 260px;">
