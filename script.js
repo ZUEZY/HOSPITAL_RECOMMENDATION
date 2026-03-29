@@ -15,7 +15,7 @@ function initMap() {
         center: initialPos, zoom: 12, mapTypeControl: false
     });
 
-    // UPDATED: Current Location is now a clear blue dot marker
+    // UPDATED: Current Location is now a clear blue dot marker to distinguish from hospital ranks
     marker = new google.maps.Marker({
         position: initialPos, map: map, draggable: true,
         animation: google.maps.Animation.DROP,
@@ -91,6 +91,7 @@ async function findHospitals() {
     };
 
     try {
+       // Note: Change this URL to http://127.0.0.1:5000/rank_hospitals for local baseline testing
        const response = await fetch('https://hospital-recommendation-w438.onrender.com/rank_hospitals', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -112,7 +113,7 @@ async function findHospitals() {
             const hMarker = new google.maps.Marker({
                 position: { lat: h.lat, lng: h.lng }, 
                 map: map,
-                // UPDATED: Rank 1 is Red, Ranks 2-5 are Green
+                // UPDATED: Rank 1 stays Red (icon 1), Rank 2-5 become Green (icon 2)
                 icon: index === 0 
                     ? 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' 
                     : 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
