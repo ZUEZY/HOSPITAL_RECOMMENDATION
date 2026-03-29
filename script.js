@@ -14,7 +14,7 @@ function initMap() {
         center: initialPos, zoom: 12, mapTypeControl: false
     });
 
-    // 🔵 CURRENT LOCATION: Blue Circle
+    // 🔵 CURRENT LOCATION: Distinct Blue Circle
     marker = new google.maps.Marker({
         position: initialPos, map: map, draggable: true,
         animation: google.maps.Animation.DROP,
@@ -107,25 +107,27 @@ async function findHospitals() {
         bounds.extend(marker.getPosition());
 
         hospitals.forEach((h, index) => {
-            // 🔴 Rank 1 = Red (#EA4335) | 🟢 Ranks 2-5 = Green (#34A853)
-            const markerColor = (index === 0) ? '#EA4335' : '#34A853';
+            // THE FIX: Use hardcoded Hex codes for SVG drawing
+            // 🔴 Rank 1 = Red (#FF0000) | 🟢 Ranks 2-5 = Green (#228B22)
+            const markerColor = (index === 0) ? '#FF0000' : '#228B22';
 
             const hMarker = new google.maps.Marker({
                 position: { lat: h.lat, lng: h.lng }, 
                 map: map,
                 icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
+                    // This creates a circular bubble shape
+                    path: "M 0,0 m -12,0 a 12,12 0 1,0 24,0 a 12,12 0 1,0 -24,0",
                     fillColor: markerColor,
                     fillOpacity: 1,
-                    strokeColor: 'white',
+                    strokeColor: '#FFFFFF',
                     strokeWeight: 2,
-                    scale: 12
+                    scale: 1.2
                 },
                 label: {
                     text: (index + 1).toString(),
                     color: "white",
                     fontWeight: "bold",
-                    fontSize: "12px"
+                    fontSize: "14px"
                 }
             });
 
