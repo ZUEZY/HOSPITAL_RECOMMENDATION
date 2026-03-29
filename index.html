@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Hospital Ranking Framework</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5ZgfCAleSG9recc2XwpR59Kaw4oJExFY&libraries=places"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Context-Adaptive ER Decision Support</h1>
+        
+        <div class="control-panel">
+            <div class="input-group location-group">
+                <input type="text" id="location-input" placeholder="Enter location or use GPS...">
+                <button id="gps-btn" title="Use My Location">📍 Locate Me</button>
+            </div>
+
+            <div class="parameter-grid">
+                <div class="input-group">
+                    <label>Medical Category</label>
+                    <select id="emergency-category">
+                        <option value="Cardiac">Cardiac (Heart)</option>
+                        <option value="Trauma">Trauma / Accident</option>
+                        <option value="Stroke">Stroke / Neuro</option>
+                        <option value="Maternity">Maternity</option>
+                        <option value="General">General Emergency</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Current Situation (Triage)</label>
+                    <select id="situation-level">
+                        <option value="Nearest">🚨 Emergency Override: Just show nearest hospitals</option>
+                        <option value="Level 1">Level 1: Life-Threatening (Fastest Verified ER)</option>
+                        <option value="Level 2" selected>Level 2: Severe (Fast ER, prefer specialist)</option>
+                        <option value="Level 3">Level 3: Stable (Willing to travel for best specialist)</option>
+                    </select>
+                </div>
+
+                <div class="input-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="ambulance-mode"> 
+                        🚑 Ambulance Mode (1.4x Speed)
+                    </label>
+                </div>
+            </div>
+
+            <button id="find-btn">Execute MCDM Ranking</button>
+            
+            <div id="first-aid-banner" class="hidden"></div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="watermark-footer">
+            &copy; 2026 This website is BDA BASED PROJECT, MTECH, DSU, HAROHALLI, BENGALURU, KARNATAKA
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
