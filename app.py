@@ -181,8 +181,21 @@ def rank_hospitals():
         if any(junk in name for junk in junk_words): 
             continue
 
+        # 🚨 NEW: Smart Synonym Dictionary for Specialty Matching
+        synonyms = {
+            'cardiac': ['cardiac', 'heart', 'cardio', 'coronary'],
+            'trauma': ['trauma', 'accident', 'ortho', 'bone'],
+            'stroke': ['stroke', 'neuro', 'brain'],
+            'maternity': ['maternity', 'women', 'mother', 'child', 'birth'],
+            'general': ['general', 'multi']
+        }
+        
         specialty_match = 0
-        if category.lower() in name or 'specialist' in types or 'specialty' in name:
+        # Get the list of words for our chosen category
+        matching_words = synonyms.get(category.lower(), [category.lower()])
+        
+        # If ANY of those words are in the hospital name, it's a 1.0 match!
+        if any(word in name for word in matching_words) or 'specialist' in types or 'specialty' in name:
             specialty_match = 1
         elif 'hospital' in types:
             specialty_match = 0.5
